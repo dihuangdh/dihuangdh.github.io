@@ -18,7 +18,7 @@
 <meta property="og:description" content="The structure from motion problem in computer vision is the problem of recovering the 3D structure of a stationary scene from a set of projective measurements, represented as a collection of 2D imag">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;StructureFromMotion&#x2F;1.jpg">
-<meta property="og:updated_time" content="2019-11-28T13:58:52.543Z">
+<meta property="og:updated_time" content="2019-11-28T14:47:26.206Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;StructureFromMotion&#x2F;1.jpg">
 
@@ -142,7 +142,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    2 minutes read (About 304 words)
+                    3 minutes read (About 468 words)
                 </span>
                 
                 
@@ -186,9 +186,16 @@
 <h2 id="Correspondence-Search"><a href="#Correspondence-Search" class="headerlink" title="Correspondence Search"></a>Correspondence Search</h2><h3 id="Feature-Extraction"><a href="#Feature-Extraction" class="headerlink" title="Feature Extraction"></a>Feature Extraction</h3><p>We wish to the features to be <strong>invariant</strong> under radiometric and geometric changes so that SfM can uniquely recognize them in multiple images. <strong>SIFT</strong>, its derivatives, and more recently learned features are the gold standard in terms of robustness.</p>
 <ul>
 <li><em>input</em>: A set of images.</li>
-<li><em>output</em>: </li>
+<li><em>output</em>: $F_{i}={(x_{j},f_{j})|j=1…N}$ of local features at location $x_{j}\in R^{2}$ represented by an appearance descriptor $f_{j}$.   </li>
 </ul>
-
+<h3 id="Matching"><a href="#Matching" class="headerlink" title="Matching"></a>Matching</h3><p>SfM discovers images that see the same scene part by leveraging the features $F_{i}$ as an appearance description of the images.</p>
+<p>The naive approach tests every image pair for scene overlap; it searches for feature correspondences by finding the most similar feature in image $I_{a}$ for every feature in image $I_{b}$, using a similarity metric comparing the appearance $f_{j}$ of the features.</p>
+<p>However, this approach has computational complexity $O(N^{2})$ and is prohibitive for large image collections. A variety of approaches tackle the problem of scalable and efficient matching.</p>
+<ul>
+<li><em>input</em>：$F_{i}={(x_{j},f_{j})|j=1…N}$</li>
+<li><em>output</em>: A set of potentially overlapping image pairs $C={I_{a},I_{b}|I_{a},I_{b}\in I, a &lt; b }$ and their associated feature correspondences $M_{ab}\in F_{a}\times F_{b}$.</li>
+</ul>
+<h3 id="Geometric-Verification"><a href="#Geometric-Verification" class="headerlink" title="Geometric Verification"></a>Geometric Verification</h3>
         </div>
         
         
@@ -362,6 +369,14 @@
         <a class="is-flex" href="#Feature-Extraction">
         <span class="has-mr-6">4.1</span>
         <span>Feature Extraction</span>
+        </a></li><li>
+        <a class="is-flex" href="#Matching">
+        <span class="has-mr-6">4.2</span>
+        <span>Matching</span>
+        </a></li><li>
+        <a class="is-flex" href="#Geometric-Verification">
+        <span class="has-mr-6">4.3</span>
+        <span>Geometric Verification</span>
         </a></li></ul></li></ul>
             </div>
         </div>
@@ -452,7 +467,7 @@
             
             <a href="/2019/11/01/hello-world/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/gallery/luca.jpg" alt="Hello World">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Hello World">
                 </p>
             </a>
             
@@ -547,7 +562,7 @@
             
             <a href="/2019/11/01/hello-world/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/gallery/luca.jpg" alt="Hello World">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="Hello World">
                 </p>
             </a>
             
