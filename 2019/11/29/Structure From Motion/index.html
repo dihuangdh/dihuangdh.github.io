@@ -18,7 +18,7 @@
 <meta property="og:description" content="The structure from motion problem in computer vision is the problem of recovering the 3D structure of a stationary scene from a set of projective measurements, represented as a collection of 2D imag">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;StructureFromMotion&#x2F;1.jpg">
-<meta property="og:updated_time" content="2019-11-28T14:47:26.206Z">
+<meta property="og:updated_time" content="2019-12-01T08:51:57.339Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;StructureFromMotion&#x2F;1.jpg">
 
@@ -142,7 +142,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    3 minutes read (About 468 words)
+                    7 minutes read (About 1044 words)
                 </span>
                 
                 
@@ -165,12 +165,16 @@
 </blockquote>
 <a id="more"></a> 
 
+<h2 id="Before-Reading"><a href="#Before-Reading" class="headerlink" title="Before Reading"></a>Before Reading</h2><ul>
+<li>This post doesn’t contain any code. So if you want to understand SfM better, I highly recommend you to run SfM by yourself. <a href="https://colmap.github.io/index.html" target="_blank" rel="noopener">Colmap</a> is a good start point.</li>
+<li>Some are copied from <a href="https://demuc.de/papers/schoenberger2016sfm.pdf" target="_blank" rel="noopener">structure from motion revisit</a>. Please have a look at the original paper.</li>
+</ul>
 <h2 id="Background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>Knowing the 3D structure of real world is meaningful. It’s a generally scientific problem and core technology of a wide variety of fields, such as computer graphics, computer vision, virtual reality, digital media, etc.</p>
 <p>The structure from motion is one of the most important algorithms to recover 3D structure. It provides a useful process of reconstructing 3D structure from its projections into a series of images taken from different viewpoints.</p>
 <h2 id="Problem-Formulation"><a href="#Problem-Formulation" class="headerlink" title="Problem Formulation"></a>Problem Formulation</h2><ul>
 <li><em>Input</em>: A collection of 2D images.</li>
 <li><em>output</em>: 3D point cloud</li>
-<li><em>Assumptions</em>: The scene is static </li>
+<li><em>Assumptions</em>: The scene is static ; …</li>
 </ul>
 <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>For general SfM, it involves the three main stages: </p>
 <ul>
@@ -189,13 +193,34 @@
 <li><em>output</em>: $F_{i}={(x_{j},f_{j})|j=1…N}$ of local features at location $x_{j}\in R^{2}$ represented by an appearance descriptor $f_{j}$.   </li>
 </ul>
 <h3 id="Matching"><a href="#Matching" class="headerlink" title="Matching"></a>Matching</h3><p>SfM discovers images that see the same scene part by leveraging the features $F_{i}$ as an appearance description of the images.</p>
-<p>The naive approach tests every image pair for scene overlap; it searches for feature correspondences by finding the most similar feature in image $I_{a}$ for every feature in image $I_{b}$, using a similarity metric comparing the appearance $f_{j}$ of the features.</p>
+<p>The naive approach tests every image pair for scene overlap; it searches for feature correspondences by <strong>finding the most similar feature in image $I_{a}$ for every feature in image $I_{b}$,</strong> using a similarity metric comparing the appearance $f_{j}$ of the features.</p>
 <p>However, this approach has computational complexity $O(N^{2})$ and is prohibitive for large image collections. A variety of approaches tackle the problem of scalable and efficient matching.</p>
 <ul>
 <li><em>input</em>：$F_{i}={(x_{j},f_{j})|j=1…N}$</li>
 <li><em>output</em>: A set of potentially overlapping image pairs $C={I_{a},I_{b}|I_{a},I_{b}\in I, a &lt; b }$ and their associated feature correspondences $M_{ab}\in F_{a}\times F_{b}$.</li>
 </ul>
-<h3 id="Geometric-Verification"><a href="#Geometric-Verification" class="headerlink" title="Geometric Verification"></a>Geometric Verification</h3>
+<h3 id="Geometric-Verification"><a href="#Geometric-Verification" class="headerlink" title="Geometric Verification"></a>Geometric Verification</h3><p>Since matching is based solely on appearance, it is not guaranteed that corresponding features actually map to the same scene point. Therefore, SfM verifies the matches by trying to <strong>estimate a transformation</strong> that maps feature points between images using projective geometry.</p>
+<p>A homography H describes the transformation of a purely rotating or a moving camera capturing a planar scene. Epipolar geometry describes the relation for a moving camera through the essential matrix E (calibrated) or the fundamental matrix F (uncalibrated), and can be extended to three views using the trifocal tensor. </p>
+<p>If a valid transformation <strong>maps a sufficient number of features between the images</strong>, they are considered geometrically <strong>verified</strong>.</p>
+<ul>
+<li><em>input</em>: A set of potentially overlapping image pairs $ C={I_{a},I_{b}|I_{a},I_{b}\in I, a &lt; b }$and their associated feature correspondences $M_{ab}\in F_{a}\times F_{b}$.</li>
+<li><em>output</em>: Geometrically verified image pairs $C={I_{a},I_{b}|I_{a},I_{b}\in I, a &lt; b } $and their associated feature correspondences $M_{ab}\in F_{a}\times F_{b}$.</li>
+</ul>
+<p>The output of this stage is a so-called scene graph with images as nodes and verified pairs of images as edges.</p>
+<h2 id="Incremental-Reconstruction"><a href="#Incremental-Reconstruction" class="headerlink" title="Incremental Reconstruction"></a>Incremental Reconstruction</h2><h3 id="Initialization"><a href="#Initialization" class="headerlink" title="Initialization"></a>Initialization</h3><p>SfM initializes the model with a carefully selected two-view reconstruction. <strong>Choosing a suitable initial pair is critical, since the reconstruction may never recover from a bad initialization.</strong></p>
+<h3 id="Image-Registration"><a href="#Image-Registration" class="headerlink" title="Image Registration"></a>Image Registration</h3><p>Starting from a metric reconstruction, <strong>new images can be registered to the current model</strong> by solving the <strong>Perspective-n-Point (PnP) problem</strong> using feature correspondences to triangulated points in already registered images.</p>
+<p>The PnP problem involves estimating the pose $P_{c}$ and, for uncalibrated cameras, its intrinsic parameters. The set $P$ is thus extended by the pose  $P_{c}$  of the newly registered image.</p>
+<h3 id="Triangulation"><a href="#Triangulation" class="headerlink" title="Triangulation"></a>Triangulation</h3><p>A newly registered image must observe existing scene points. In addition, it may also increase scene coverage by extending the set of points X through triangulation.  A new scene point $X_{k}$ can be <strong>triangulated and added</strong> to $X$ as soon as at least one more image, also covering the new scene part but from a different viewpoint, is registered.</p>
+<p>Triangulation is a crucial step in SfM, as it increases the stability of the existing model through redundancy and it enables registration of new images by providing additional 2D-3D correspondences.</p>
+<h3 id="Bundle-Adjustment"><a href="#Bundle-Adjustment" class="headerlink" title="Bundle Adjustment"></a>Bundle Adjustment</h3><p>Image registration and triangulation are <strong>separate procedures</strong>, even though their products are highly correlated uncertainties in the camera pose propagate to triangulated points and vice versa, and additional triangulations may improve the initial camera pose through increased redundancy. <strong>Without further refinement, SfM usually drifts quickly to a non-recoverable state. BA  is the joint non-linear refinement of camera parameters $P_{c}$  and point parameters $X_{k}$ that minimizes the reprojection error</strong><br>$$<br>E=\Sigma_{j}\rho_{j}(||\pi(P_{c},X_{k})-x_{j}||^{2}_{2})<br>$$</p>
+<p>using a function $\pi$  that projects scene points to image space and a loss function  $\rho_{j}$ to potentially down-weight outliers.</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><p><a href="https://demuc.de/papers/schoenberger2016sfm.pdf" target="_blank" rel="noopener">structure from motion revisit</a></p>
+</li>
+<li><p><a href="https://arxiv.org/abs/1701.08493" target="_blank" rel="noopener">A survey of structure from motion</a></p>
+</li>
+</ul>
+
         </div>
         
         
@@ -350,34 +375,62 @@
                     Catalogue
                 </h3>
                 <ul class="menu-list"><li>
-        <a class="is-flex" href="#Background">
+        <a class="is-flex" href="#Before-Reading">
         <span class="has-mr-6">1</span>
+        <span>Before Reading</span>
+        </a></li><li>
+        <a class="is-flex" href="#Background">
+        <span class="has-mr-6">2</span>
         <span>Background</span>
         </a></li><li>
         <a class="is-flex" href="#Problem-Formulation">
-        <span class="has-mr-6">2</span>
+        <span class="has-mr-6">3</span>
         <span>Problem Formulation</span>
         </a></li><li>
         <a class="is-flex" href="#Overview">
-        <span class="has-mr-6">3</span>
+        <span class="has-mr-6">4</span>
         <span>Overview</span>
         </a></li><li>
         <a class="is-flex" href="#Correspondence-Search">
-        <span class="has-mr-6">4</span>
+        <span class="has-mr-6">5</span>
         <span>Correspondence Search</span>
         </a><ul class="menu-list"><li>
         <a class="is-flex" href="#Feature-Extraction">
-        <span class="has-mr-6">4.1</span>
+        <span class="has-mr-6">5.1</span>
         <span>Feature Extraction</span>
         </a></li><li>
         <a class="is-flex" href="#Matching">
-        <span class="has-mr-6">4.2</span>
+        <span class="has-mr-6">5.2</span>
         <span>Matching</span>
         </a></li><li>
         <a class="is-flex" href="#Geometric-Verification">
-        <span class="has-mr-6">4.3</span>
+        <span class="has-mr-6">5.3</span>
         <span>Geometric Verification</span>
-        </a></li></ul></li></ul>
+        </a></li></ul></li><li>
+        <a class="is-flex" href="#Incremental-Reconstruction">
+        <span class="has-mr-6">6</span>
+        <span>Incremental Reconstruction</span>
+        </a><ul class="menu-list"><li>
+        <a class="is-flex" href="#Initialization">
+        <span class="has-mr-6">6.1</span>
+        <span>Initialization</span>
+        </a></li><li>
+        <a class="is-flex" href="#Image-Registration">
+        <span class="has-mr-6">6.2</span>
+        <span>Image Registration</span>
+        </a></li><li>
+        <a class="is-flex" href="#Triangulation">
+        <span class="has-mr-6">6.3</span>
+        <span>Triangulation</span>
+        </a></li><li>
+        <a class="is-flex" href="#Bundle-Adjustment">
+        <span class="has-mr-6">6.4</span>
+        <span>Bundle Adjustment</span>
+        </a></li></ul></li><li>
+        <a class="is-flex" href="#Reference">
+        <span class="has-mr-6">7</span>
+        <span>Reference</span>
+        </a></li></ul>
             </div>
         </div>
     </div>
