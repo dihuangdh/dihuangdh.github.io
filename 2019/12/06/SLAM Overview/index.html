@@ -19,7 +19,7 @@
 <meta property="og:description" content="This post is aimed for introducing basic SLAM knowledge, especially visual SLAM. Only the general pipeline will be list here,  I won’t touch lots of algorithm details. This will be suitable for those">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;SLAMOverview&#x2F;1.png">
-<meta property="og:updated_time" content="2019-12-06T13:49:28.696Z">
+<meta property="og:updated_time" content="2019-12-07T09:04:41.677Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;SLAMOverview&#x2F;1.png">
 
@@ -143,7 +143,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    a minute read (About 129 words)
+                    6 minutes read (About 886 words)
                 </span>
                 
                 
@@ -170,7 +170,48 @@
 <p>– <em>Past, Present, and Future of Simultaneous Localization and Mapping: Toward the Robust-Perception Age</em></p>
 </blockquote>
 <p>To be easy, SLAM is a system which does <strong>Mapping</strong>(building a map) and <strong>Localization</strong>(locating the sensor)  at the same time. </p>
-<h2 id="Why-we-need-SLAM"><a href="#Why-we-need-SLAM" class="headerlink" title="Why we need SLAM"></a>Why we need SLAM</h2>
+<h2 id="Why-we-need-SLAM"><a href="#Why-we-need-SLAM" class="headerlink" title="Why we need SLAM"></a>Why we need SLAM</h2><blockquote>
+<p>First of all, we observe that the SLAM research done over the last decade has itself produced <strong>the visual-inertial odometry algorithm that currently represent the state-of-the-art</strong>. More generally, SLAM has directly led to the study of sensor fusion under more challenging setups (i.e., no GPS, low quality sensors) than previously considered in other literature (e.g., inertial navigation in aerospace engineering).</p>
+<p>The second answer regards <strong>the true topology of the environment</strong>.</p>
+<p>The third answer is that SLAM is needed for many <strong>applications</strong> that, either implicitly or explicitly, <strong>do require a globally consistent map</strong>.</p>
+<p>– <em>Past, Present, and Future of Simultaneous Localization and Mapping: Toward the Robust-Perception Age</em></p>
+</blockquote>
+<h2 id="Types-of-SLAM-Camera"><a href="#Types-of-SLAM-Camera" class="headerlink" title="Types of SLAM Camera"></a>Types of SLAM Camera</h2><p>For visual SLAM, there are three popular types of camera: <strong>Monocular Camera, Stereo Camera, RGB-D Camera</strong>. Although nowadays new types of camera have shown up, they havn’t been widely used. </p>
+<ul>
+<li><strong>Monocular</strong>: If the SLAM system is built using monocular camera, we call the system <strong>Monocular SLAM</strong>. Since monocular cameras are really cheap and easy to get, lots of researchers pay attention on the monocular SLAM. The main problem of Monocular SLAM is <strong>‘scale ambiguity’</strong>.</li>
+<li><strong>Stereo Camera</strong>: Use two cameras to recover the image depth. The <strong>Baseline</strong>(distance between two cameras) need to be known. When the baseline distance is larger, the stereo can see further.  The main problem of stereo camera is difficult calibration and high computation cost.</li>
+<li><strong>RGB-D Camera</strong>: This camera type use structured light or ToF(Time-of-Flight) to get the depth map.Different from the stereo camera, RGB-D cameras don’t need to do lots of depth computation. The main problem of RGB-D camera is noisy data, limited field of view … RGB-D cameras are often used in indoor SLAM systems. For in-the-wild SLAM, it’s much more difficult to use RGB-D. </li>
+</ul>
+<h2 id="Typical-SLAM-Pipeline"><a href="#Typical-SLAM-Pipeline" class="headerlink" title="Typical SLAM Pipeline"></a>Typical SLAM Pipeline</h2><blockquote>
+<p>The architecture of a SLAM system includes two main components: the front end and the back end. The front end abstracts sensor data into models that are amenable for estimation, while the back end performs inference on the abstracted data produced by the front end.</p>
+<p>– <em>Past, Present, and Future of Simultaneous Localization and Mapping: Toward the Robust-Perception Age</em></p>
+</blockquote>
+<div align="center"> 
+  <img src="/pictures/SLAMOverview/pipeline.png" width="600" height="400" alt="Front end and back end in a typical SLAM system." align="center">
+</div>
+
+<p>The figure from paper shows the main components of SLAM pipeline. Though clear enough, it doesn’t explain enough details. Actually, I found people prefer to use following components to describe typical SLAM pipeline:</p>
+<ul>
+<li>Sensor Data Reading.</li>
+<li><strong>Front End: Visual Odometry</strong>.  Calculate camera motion between frames, build local map.</li>
+<li><strong>Back End: Optimization</strong>. Accept camera pose of visual odometer, infomation of loop closing, then start optimization, to get global trajectory and map.</li>
+<li><strong>Loop Closure</strong>. Detect loop. If exist, pass information to back end.</li>
+<li><strong>Mapping</strong>. Build map.</li>
+</ul>
+<h2 id="Visual-Odometry"><a href="#Visual-Odometry" class="headerlink" title="Visual Odometry"></a>Visual Odometry</h2><p>Visual odeometry is the front-end of a SLAM system. It use adjacent images to estimate rough camera motion, and provide data for back-end. Basicly, there are two kinds of methods.</p>
+<ul>
+<li><strong>Feature Based Methods</strong>. Feature based methods need to extract features from images first, and use those features to do computations. Features based methods are always viewed as the mainstream of visual odometry, because they are <strong>stable, and insensitive to light and motion</strong>.</li>
+<li><strong>Direct Methods</strong>. Though feature is useful and robust, those methods suffer from the time consuming and feature losing. Direct methods could use all information in the images. Nowadays, direct methods are becoming important role in the SLAM area.</li>
+</ul>
+<p>Let’s have a close look at the feature based methods. </p>
+<h3 id="Feature-Extraction"><a href="#Feature-Extraction" class="headerlink" title="Feature Extraction"></a>Feature Extraction</h3><p>Feature can be thought as a compact information representation of any data. In this case, the features are trying to keep useful information in the images.  There are lots of human designed features in the computer vision area, such as SIFT, SURF, ORB etc. One thing we need to make clear: feature has two components, <strong>key-point</strong> and <strong>descriptor</strong>. So, when we talk about SIFT, we mean extracting SIFT key point, and calculating SIFT descriptor. When feature descriptors are similar(close in the criterion space), we can regard them as same point.</p>
+<p>For SLAM, the feature should be robust, accurate and fast. ORB features are commonly used features. *<em>ORB features have scale and rotation invariance, and really fast. *</em></p>
+<h3 id="Epipolar-Constraint"><a href="#Epipolar-Constraint" class="headerlink" title="Epipolar Constraint"></a>Epipolar Constraint</h3><p>Epipoar constraint is basic geometry relationship in SLAM. In this part, we can use epipolar constraint to calculate camera motion. I will explain them in the near future. Right now let’s pass this part. For more details, I highly recommend course <em>Multi-view Geometry</em>. </p>
+<div align="center"> 
+  <img src="/pictures/SLAMOverview/epipolar.png" width="250" height="100" alt="Epipolar Constraint." align="center">
+</div>
+
+<h3 id="Triangulation"><a href="#Triangulation" class="headerlink" title="Triangulation"></a>Triangulation</h3><h3 id="PnP-Problem"><a href="#PnP-Problem" class="headerlink" title="PnP Problem"></a>PnP Problem</h3><h3 id="Point-Cloud-Matching-ICP"><a href="#Point-Cloud-Matching-ICP" class="headerlink" title="Point Cloud Matching: ICP"></a>Point Cloud Matching: ICP</h3><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2>
         </div>
         
         <div class="level is-size-7 is-uppercase">
