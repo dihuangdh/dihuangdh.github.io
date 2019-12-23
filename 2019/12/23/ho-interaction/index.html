@@ -7,21 +7,21 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-<title>DensePose - Di Huang</title>
+<title>Hand and Object Pose Estimation and Reconstruction - Di Huang</title>
 
 
-    <meta name="description" content="Human pose estimation has been a popular research topic in the past few years. Machines are able to recover human skeleton structure by estimating 3d human key points. However, key points are one kind">
-<meta name="keywords" content="densepose">
+    <meta name="description" content="In 2019, there are two new papers introducing hand-object interaction, one paper (H+O: Unified Egocentric Recognition of 3D Hand-Object Poses and Interactions) estiamtes poses of hand and object, and">
+<meta name="keywords" content="ho-pose-reconstruction">
 <meta property="og:type" content="article">
-<meta property="og:title" content="DensePose">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;11&#x2F;densepose&#x2F;index.html">
+<meta property="og:title" content="Hand and Object Pose Estimation and Reconstruction">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;23&#x2F;ho-interaction&#x2F;index.html">
 <meta property="og:site_name" content="Di Huang">
-<meta property="og:description" content="Human pose estimation has been a popular research topic in the past few years. Machines are able to recover human skeleton structure by estimating 3d human key points. However, key points are one kind">
+<meta property="og:description" content="In 2019, there are two new papers introducing hand-object interaction, one paper (H+O: Unified Egocentric Recognition of 3D Hand-Object Poses and Interactions) estiamtes poses of hand and object, and">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;densepose&#x2F;1.jpg">
-<meta property="og:updated_time" content="2019-12-23T06:58:48.246Z">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;ho&#x2F;1.png">
+<meta property="og:updated_time" content="2019-12-23T08:51:08.497Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;densepose&#x2F;1.jpg">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;ho&#x2F;1.png">
 
 
 
@@ -125,7 +125,7 @@
     
     <div class="card-image">
         <span  class="image is-7by1">
-            <img class="thumbnail" src="/pictures/densepose/1.jpg" alt="DensePose">
+            <img class="thumbnail" src="/pictures/ho/1.png" alt="Hand and Object Pose Estimation and Reconstruction">
         </span>
     </div>
     
@@ -133,17 +133,17 @@
         
         <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
             <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2019-12-11T02:35:00.000Z">2019-12-11</time>
+                <time class="level-item has-text-grey" datetime="2019-12-23T04:08:00.000Z">2019-12-23</time>
                 
                 <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/cv-human/">cv-human</a>
+                <a class="has-link-grey -link" href="/categories/cv-ho/">cv-ho</a>
                 </div>
                 
                 
                 <span class="level-item has-text-grey">
                     
                     
-                    2 minutes read (About 311 words)
+                    6 minutes read (About 958 words)
                 </span>
                 
                 
@@ -157,57 +157,93 @@
         
         <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
             
-                DensePose
+                Hand and Object Pose Estimation and Reconstruction
             
         </h1>
         <div class="content">
-            <p>Human pose estimation has been a popular research topic in the past few years. Machines are able to recover human skeleton structure by estimating 3d human key points. However, key points are one kind of sparse representations. Sometimes we want a more dense representation. This paper gives a possible solution towards  predicting dense correspondences from an image to a surface-based model.</p>
+            <p>In 2019, there are two new papers introducing hand-object interaction, one paper (<strong>H+O: Unified Egocentric Recognition of 3D Hand-Object Poses and Interactions</strong>) estiamtes poses of hand and object, and  uses hand-object relationship to do high-level tasks like action recognition. Another paper (<strong>Learning joint reconstruction of hands and manipulated objects</strong>) does jointly shape reconstruction for hand and object, and use relationships between them to help realistic reconstruction. This post give a simple introduction towards those two papers, and give some thinkings.</p>
  <a id="more"></a> 
 
-<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><ul>
-<li><strong>Gather dense correspondences for 50K persons appearing in the COCO dataset</strong> by introducing an effieient annotation pipeline.</li>
-<li>Use this dataset to train CNN-based systems that deliver dense correspondences ‘in the wild’,  by <strong>regressing body surface coordinates at any image pixel</strong>.</li>
-<li>Use sparse correspondences to train a <strong>‘teacher’ network that can ‘inpaint’ the supervision signal</strong> in the rest of the image domain. This gain better performance when compared to either sparse points or any other existing dataset.</li>
-</ul>
-<h2 id="DATASET"><a href="#DATASET" class="headerlink" title="DATASET"></a>DATASET</h2><ul>
-<li><p>Called COCO-Dense Pose. </p>
-</li>
-<li><p>UV map defination:</p>
-<ul>
-<li>Head, hands, feet: SMPL defined UV map</li>
-<li>Other parts: obtain the unwrapping via multidimensional scaling applied to pairwise geodesic distances.</li>
-</ul>
-</li>
-<li><p>Annotation: 1. Region; 2. Sparse correspondences</p>
-</li>
-</ul>
-<h2 id="Network"><a href="#Network" class="headerlink" title="Network"></a>Network</h2><h3 id="Region-based-dense-pose-regression"><a href="#Region-based-dense-pose-regression" class="headerlink" title="Region-based dense pose regression"></a>Region-based dense pose regression</h3><div align="center"> 
-  <img src="/pictures/densepose/2.png" width="500" height="300" alt="DensePose-RCNN architecture." align="center">
-</div>
-
-<h3 id="Multitask-cascaded-architectures"><a href="#Multitask-cascaded-architectures" class="headerlink" title="Multitask cascaded architectures"></a>Multitask cascaded architectures</h3><div align="center"> 
-  <img src="/pictures/densepose/3.png" width="500" height="300" alt="Cross-cascading architecture." align="center">
-</div>
-
-<h2 id="Learning"><a href="#Learning" class="headerlink" title="Learning"></a>Learning</h2><ul>
-<li>Even though the target is dense pose estimation at test time, in every training sample, the dataset only annotate a <strong>sparse subset of the pixels</strong>, approximately 100-150 per human.</li>
-<li>This is not a problem during training, the solution is to making classification/regression losses oblivious to points where the group-truth correspondence was not collected, simply but <strong>not including them in the summation over the per-pixel losses</strong>.</li>
-<li>By ‘inpainting’ the values of the supervision signal on positions that were not originally annotated, the network botain better results. For this, the author adopts a learning-based approach where they firstly train a ‘teacher’ network to reconstruct the ground-truth values wherever these are observed, and then deploy it on the full image domain, yielding a dense supervision signal.</li>
+<h2 id="When-we-talk-about-Hand-Object-Interaction"><a href="#When-we-talk-about-Hand-Object-Interaction" class="headerlink" title="When we talk about Hand-Object Interaction"></a>When we talk about Hand-Object Interaction</h2><p>Before we start introducing these two paper, we should make some defination for hand-object interaction, and understand why we need it, why it is important for both researcher and engineer. When we talk about hand-object interaction, we are saying tasks which contains more information than hand-only or object-only tasks. If we are handing hands and object at the same time, there are real word constrains and high-level releationships like action between hands and object. <strong>Generally, hand-object interaction is one kind of relationship between human hands and object, including geometry constrains like contact and recognition relationship like action purpose.</strong></p>
+<p>Why we need to model this kind of relationship? I think it benifits both recognition and construction tasks. Here I copy part of the papers:</p>
+<blockquote>
+<p>Human behavior can be characterized by the individual actions a person takes in interaction with the surrounding objects and the environment.</p>
+</blockquote>
+<blockquote>
+<p>Accurate estimation of human hands, as well as their interactions with the physical world, is vital to better understand human actions and interactions. In particular, recovering the 3D shape of a hand is key to many applications including virtual and augmented reality, human-computer interaction, action recognition and imitation-based learning of robotic skills.</p>
+</blockquote>
+<h2 id="Pipelines"><a href="#Pipelines" class="headerlink" title="Pipelines"></a>Pipelines</h2><h3 id="Jointly-Hand-Object-Pose-Estimation"><a href="#Jointly-Hand-Object-Pose-Estimation" class="headerlink" title="Jointly Hand-Object Pose Estimation"></a>Jointly Hand-Object Pose Estimation</h3><ul>
+<li><strong>H+O: Unified Egocentric Recognition of 3D Hand-Object Poses and Interactions, CVPR19 oral</strong></li>
 </ul>
 <div align="center"> 
-  <img src="/pictures/densepose/4.png" width="380" height="250" alt="Teacher-student architecture." align="center">
+  <img src="/pictures/ho/2.png" width="700" height="400" alt="Overview of Hand-Object Pose Estimation Pipeline." align="center">
 </div>
 
-<h2 id="Result"><a href="#Result" class="headerlink" title="Result"></a>Result</h2><div align="center"> 
-  <img src="/pictures/densepose/5.png" width="800" height="600" alt="Result." align="center">
+<ul>
+<li><strong>Author</strong>: Bugra Tekin, who is working on human pose estimation, object pose estimation. Microsoft</li>
+<li><strong>Dataset</strong>: <ul>
+<li><strong>FPHA-HO</strong>. Subset of FPHA. Action recognition dataset. Contains annotations for 6D object pose and hand pose. 4 objects. 10 different action categories.</li>
+<li><strong>EgoDexter</strong>: Real dataset. 3D hand pose nad 6D object pose.  Add annotation by hands. For evaluation.</li>
+<li><strong>SynthHands</strong>: Synthetic hands pose estimation dataset.</li>
+</ul>
+</li>
+<li><strong>Pipeline</strong>: <em>We propose a unified framework for recognizing 3D hand and object interactions by simultaneously solving four tasks in a feed-forward pass through a neural network: <strong>3D hand pose estimation, object pose estimation, object recognition and activity classification.</strong> Our method operates on monocular color images and relies on joint features that are shared among all the tasks.</em></li>
+<li><strong>Hand-Object Interaction Modeling</strong>: <em>Our scheme relies on <strong>a common output representation</strong> for both hands and objects that parametrizes their pose with 3D control points.</em></li>
+</ul>
+<h3 id="Jointly-Hand-Object-Reconstruction"><a href="#Jointly-Hand-Object-Reconstruction" class="headerlink" title="Jointly Hand-Object Reconstruction"></a>Jointly Hand-Object Reconstruction</h3><ul>
+<li><strong>Learning joint reconstruction of hands and manipulated objects, CVPR19</strong></li>
+</ul>
+<div align="center"> 
+  <img src="/pictures/ho/3.png" width="500" height="400" alt="Overview of Hand-Object Reconstruction Pipeline." align="center">
 </div>
+
+<ul>
+<li><p><strong>Author</strong>: Yana Hasson, phd student INRIA. Her first paper. Interestingly, I find I ran her I3D code before. </p>
+</li>
+<li><p><strong>Dataset</strong>:</p>
+<ul>
+<li><strong>FPHA-HO</strong>. Subset of FPHA. Action recognition dataset. Contains annotations for 6D object pose and hand pose. 4 objects. 10 different action categories.</li>
+<li><strong>HIC</strong>. Hand and object meshes are provided.</li>
+<li><strong>ObMan</strong>: Synthetic. To overcome the lack of adequate training data.</li>
+</ul>
+</li>
+<li><p><strong>Pipeline</strong>: <em>Our network architecture is split into two branches. The first branch reconstructs the object shape in a normalized coordinate space. The second branch predicts the hand mesh as well as the information necessary to transfer the object to the hand-relative coordinate system. Each branch has a ResNet18 encoder pre-trained on ImageNet.</em></p>
+</li>
+<li><p><strong>Hand-Object Interaction Modeling</strong>: <em>prior knowledge that objects can not interpenetrate each other and that, when grasping objects, contacts occur at the surface between the object and the hand.</em></p>
+<ul>
+<li><strong>Repulsion</strong>: penalizes hand and object interpenetration.</li>
+<li><strong>Attraction</strong>: penalize cases in which hand vertices are in the vicinity of the object but the surfaces are not in contact.</li>
+</ul>
+</li>
+</ul>
+<h2 id="What’s-the-next-step"><a href="#What’s-the-next-step" class="headerlink" title="What’s the next step?"></a>What’s the next step?</h2><p>I believe 2019 is the start year for jointly hand-object interaction learning from RGB data. Before these two papers, research on hand-object interaction are rely on RGB-D data. I haven’t read those papers yet, so I won’t compare them here. Let’s have a close look at these two papers.</p>
+<p>For <strong>H+O</strong>, its h-o modeling is rough. But since its final task is action recognition, some loss on geometry space is acceptable. Using the same presentation, the network can predict hand key points and object keypoints at the same time, and finally get hand pose and object pose by solving a PnP problem. This method doesn’t explicitly model the interaction between hand and object, but let network to learn the relationship. To be honest, this seems a little too simple. I am not quite sure if a more accurate modeling will help recognition tasks. </p>
+<p><strong>Learning joint reconstruction of hands and manipulated objects</strong> uses and end-to-end pipeline to do hand-object reconstruction jointly. Make interaction as a loss item is a simple but effect idea. I believe this simple pipeline will be an important reference for next year works. </p>
+<p>For the future trends, possible ideas are as follows:</p>
+<ul>
+<li><strong>Third-Person View</strong>. Nowadays hand-object are mainly working on first-person images. This is mainly because the lack of third-person view data. But we need third-person view to help understand hand-object interaction. Those will definitely help third-person view human reconstruction. </li>
+<li><strong>Add Semantic Prior</strong>. Add semantic prior will help Han-object reconstruction. Since those semantic information gives a rough idea about the relation of hand and object.</li>
+<li><strong>More Accurate Interaction Modeling</strong>. Contact is the main interaction form. So there are questions: <ul>
+<li><ol>
+<li>Is contact the only interaction relationship between hand and object? </li>
+</ol>
+</li>
+<li><ol start="2">
+<li>How to model the contact? Are repulsion and attraction enough to describe contact? </li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<p>Thanks.</p>
+
         </div>
         
         <div class="level is-size-7 is-uppercase">
             <div class="level-start">
                 <div class="level-item">
                     <span class="is-size-6 has-text-grey has-mr-7">#</span>
-                    <a class="has-link-grey -link" href="/tags/densepose/" rel="tag">densepose</a>
+                    <a class="has-link-grey -link" href="/tags/ho-pose-reconstruction/" rel="tag">ho-pose-reconstruction</a>
                 </div>
             </div>
         </div>
@@ -224,17 +260,10 @@
 <div class="card card-transparent">
     <div class="level post-navigation is-flex-wrap is-mobile">
         
-        <div class="level-start">
-            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/12/23/ho-interaction/">
-                <i class="level-item fas fa-chevron-left"></i>
-                <span class="level-item">Hand and Object Pose Estimation and Reconstruction</span>
-            </a>
-        </div>
-        
         
         <div class="level-end">
-            <a class="level level-item has-link-grey  article-nav-next" href="/2019/12/06/SLAM%20Overview/">
-                <span class="level-item">Rough Overview of SLAM</span>
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/12/11/densepose/">
+                <span class="level-item">DensePose</span>
                 <i class="level-item fas fa-chevron-right"></i>
             </a>
         </div>
