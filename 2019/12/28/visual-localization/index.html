@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html  lang="en">
+<head>
+    <meta charset="utf-8" />
+
+<meta name="generator" content="Hexo 4.0.0" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+<title>Image-Based Localization - Di Huang</title>
+
+
+    <meta name="description" content="Visual localization: Given a scene representation computed from a database of geo-tagged images, e.g., a 3D model recovered via Structure-from-Motion, visual localization approaches aim to estimate th">
+<meta name="keywords" content="localization">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Image-Based Localization">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;28&#x2F;visual-localization&#x2F;index.html">
+<meta property="og:site_name" content="Di Huang">
+<meta property="og:description" content="Visual localization: Given a scene representation computed from a database of geo-tagged images, e.g., a 3D model recovered via Structure-from-Motion, visual localization approaches aim to estimate th">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;localization&#x2F;1.png">
+<meta property="og:updated_time" content="2019-12-28T08:42:06.106Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;pictures&#x2F;localization&#x2F;1.png">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.svg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+<style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+
+    
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+
+    
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+    
+    
+    
+    
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+    
+    
+    
+    
+    
+    
+    
+    <link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+    
+    <script async="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-1-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                Di Huang
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item"
+                href="/">Home</a>
+                
+                <a class="navbar-item"
+                href="/archives">Archives</a>
+                
+                <a class="navbar-item"
+                href="https://dihuangdh.github.io/publications/wb.html">Publications</a>
+                
+                <a class="navbar-item"
+                href="/categories">Categories</a>
+                
+                <a class="navbar-item"
+                href="/tags">Tags</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-12 has-order-2 column-main">
+<div class="card">
+    
+    <div class="card-image">
+        <span  class="image is-7by1">
+            <img class="thumbnail" src="/pictures/localization/1.png" alt="Image-Based Localization">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-12-28T05:52:00.000Z">2019-12-28</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/cv-localization/">cv-localization</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    6 minutes read (About 887 words)
+                </span>
+                
+                
+                <span class="level-item has-text-grey" id="busuanzi_container_page_pv">
+                    <i class="far fa-eye"></i>
+                    <span id="busuanzi_value_page_pv">0</span> visits
+                </span>
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                Image-Based Localization
+            
+        </h1>
+        <div class="content">
+            <p>Visual localization: Given a scene representation computed from a database of geo-tagged images, e.g., a 3D model recovered via Structure-from-Motion, visual localization approaches aim to estimate the full 6 Degree-of-Freedom (6DOF) pose of a query image, i.e., the position and orientation from which the image was taken. It’s a fundamental step in many Computer Vision applications, including robotics, autonomous vehicles (self-driving cars), Augmented / Mixed / Virtual Reality, loop closure detection in SLAM, and Structure-from-Motion.</p>
+ <a id="more"></a> 
+
+<h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><div align="center"> 
+  <img src="/pictures/localization/2.png" width="700" height="600" alt="Overview Localization Methods." align="center">
+</div>
+
+<p>Often mothods are devided into two categories: feature-based localization or learning-based localization.</p>
+<h3 id="Feature-based-Visual-Localization"><a href="#Feature-based-Visual-Localization" class="headerlink" title="Feature-based Visual Localization"></a>Feature-based Visual Localization</h3><p>Assuming that the scene is represented by a 3D Structure-from-Motion model, the full 6DOF pose of a query image can be estimated very precisely. Approaches for feature-based visual localization compute the pose from 2D-3D matches between 2D features in the query image and 3D points in the model. These correspondences are determined by matching the descriptors of the query features against descriptors associated with the 3D points.</p>
+<h3 id="Learning-based-Visual-Localization"><a href="#Learning-based-Visual-Localization" class="headerlink" title="Learning-based Visual Localization"></a>Learning-based Visual Localization</h3><p>Compared to feature-based methods, which use an explicit representation of the scene in the form of a 3D model, these approaches implicitly represent the scene via the weights of their neural networks. </p>
+<p>The first line of research asks whether the full, classical localization pipeline can be replaced by machine learning techniques. Such approaches regress the 6D camera pose directly from an input image using a neural network. </p>
+<p>The second line of research keeps the overall strategy of classical visual localization, and replaces only parts with learned alternatives. In particular, methods based on scene coordinate regression learn to predict a 3D point coordinate densely, for each pixel in an image. Standard pose estimation strategies (covered in the previous parts of the tutorial) are then used to compute the camera pose from the resulting set of 2D-3D matches. </p>
+<h2 id="Feature-based-Visual-Localization-1"><a href="#Feature-based-Visual-Localization-1" class="headerlink" title="Feature-based Visual Localization"></a>Feature-based Visual Localization</h2><div align="center"> 
+  <img src="/pictures/localization/3.png" width="700" height="600" alt="Old Feature-based Visual Localization." align="center">
+</div>
+
+<p>There are three most frequently talked feature-based localization methods:</p>
+<ul>
+<li>A simple baseline<ul>
+<li>[ICCV 2011] Fast Image-Based Localization using Direct 2D-to-3D Matching.</li>
+<li>Excellent localization effectiveness</li>
+<li>Slow !</li>
+</ul>
+</li>
+<li>Vocabulary-based prioritized search (VPS)<ul>
+<li>[ICCV 2011] Fast Image-Based Localization using Direct 2D-to-3D Matching.</li>
+<li>Idea: not all matches required for accurate localization.</li>
+<li>10x faster than simple baseline kd-tree</li>
+<li>Less effective than kd-tree !</li>
+</ul>
+</li>
+<li>Active Search<ul>
+<li>[PAMI 2017] Efficient &amp; Effective Prioritized Matching for Large-Scale Image-Based Localization</li>
+<li>Idea: exploit co-occurrence of matches to recover matches</li>
+<li>Reduce quantization artifacts.</li>
+<li>Reuse existing data structures.</li>
+<li>Same prioritization function.</li>
+</ul>
+</li>
+</ul>
+<div align="center"> 
+  <img src="/pictures/localization/4.png" width="600" height="500" alt="Overview Localization Methods." align="center">
+</div>
+
+<h2 id="Absolute-Pose-Regression"><a href="#Absolute-Pose-Regression" class="headerlink" title="Absolute Pose Regression"></a>Absolute Pose Regression</h2><div align="center"> 
+  <img src="/pictures/localization/5.png" width="700" height="600" alt="Absolute pose regression results." align="center">
+</div>
+
+<h2 id="Scene-Coordinate-Regression"><a href="#Scene-Coordinate-Regression" class="headerlink" title="Scene Coordinate Regression"></a>Scene Coordinate Regression</h2><div align="center"> 
+  <img src="/pictures/localization/6.png" width="600" height="500" alt="Scene Coordinate Regression." align="center">
+</div>
+
+<p>There are some most frequently talked scene coordinate regression localization methods:</p>
+<ul>
+<li>Random Forest-based<ul>
+<li>[CVPR 13] Scene Coordinate Regression Forests for Camera Relocalization in RGB-D Images.</li>
+</ul>
+</li>
+<li>CNN-based</li>
+<li>End-to-end Training <ul>
+<li>[CVPR 16] [DSAC] DSAC - Differentiable RANSAC for Camera Localization.</li>
+<li>[CVPR 18] [DSAC++] Learning less is more - 6D cameara localization via 3D surface regression.</li>
+<li>[ICCV 19] [NG-DSAC++] Neural-Guided RANSAC: Learning Where to Sample Model Hypotheses.</li>
+</ul>
+</li>
+</ul>
+<div align="center"> 
+  <img src="/pictures/localization/7.png" width="200" height="400" alt="Scene Coordinate Regression Results." align="center">
+</div>
+
+<ul>
+<li>Impact of End-to-End training<ul>
+<li>Directly optimize model quality: differentiate through RANSAC, learning data point selection.</li>
+<li>Large boost in accuracy: CNN learns to focus on stable structures.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Feature-based-vs-Learning-based-Localization"><a href="#Feature-based-vs-Learning-based-Localization" class="headerlink" title="Feature-based vs. Learning-based Localization"></a>Feature-based vs. Learning-based Localization</h2><h3 id="Accuracy"><a href="#Accuracy" class="headerlink" title="Accuracy"></a>Accuracy</h3><div align="center"> 
+  <img src="/pictures/localization/8.png" width="400" height="300" alt align="center">
+</div>
+
+<ul>
+<li>Learning Absolute Pose Regression has low accuracy due to<ul>
+<li>Needing to learn base poses from limited training data.</li>
+<li>Needing to extrapolate at test time.</li>
+<li>Using a global receptive field.</li>
+</ul>
+</li>
+<li>Learned Scene Coordinate Regression bests feature-based methods<ul>
+<li>On small-scale datasets.</li>
+</ul>
+</li>
+<li>Open Problems:<ul>
+<li>What are the limits of our datasets?</li>
+<li>Robustness when changing conditions.</li>
+<li>Uncertainty of pose estimation.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Scalability"><a href="#Scalability" class="headerlink" title="Scalability"></a>Scalability</h3><div align="center"> 
+  <img src="/pictures/localization/9.png" width="700" height="600" alt align="center">
+</div>
+
+<ul>
+<li>Open Problems:<ul>
+<li>Feature-based methods still superior for large scale re-localization.</li>
+<li>CNN-based features already outperform hand-crafted features.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Requiring-an-Explicit-3D-Model"><a href="#Requiring-an-Explicit-3D-Model" class="headerlink" title="Requiring an Explicit 3D Model"></a>Requiring an Explicit 3D Model</h3><ul>
+<li>Feature-based methods require an explicit 3D reconstruction of the scene.<ul>
+<li>Usually done using off-the-shelf structure-from-motion tools.</li>
+</ul>
+</li>
+<li>CNN-based method encode the scene in the network weights.<ul>
+<li>Do we need an explicit 3D reconstruction for training?</li>
+</ul>
+</li>
+<li>Open Problems:<ul>
+<li>Multi-view constraints did not help much so far.</li>
+<li>We still require ground truth poses.</li>
+<li>Move toward SfM and SLAM.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Model-Size"><a href="#Model-Size" class="headerlink" title="Model Size"></a>Model Size</h3><div align="center"> 
+  <img src="/pictures/localization/10.png" width="700" height="600" alt align="center">
+</div>
+
+<ul>
+<li>Learning-based methods encode the scene geometry into network weights.</li>
+<li>The trade-off between accuracy and compression turns out to be rather good.</li>
+<li>Open Problems:<ul>
+<li>Model size is defined by the user, not the dataset.</li>
+<li>Work on network compression should be useful here.</li>
+</ul>
+</li>
+</ul>
+<h2 id="Long-Term-Localization"><a href="#Long-Term-Localization" class="headerlink" title="Long-Term Localization"></a>Long-Term Localization</h2><p>World is not static, appearance and geometry change.</p>
+<h3 id="Datasets"><a href="#Datasets" class="headerlink" title="Datasets"></a>Datasets</h3><ul>
+<li>Day-Night: Aachen Day-Night Dataset</li>
+<li>Seasons: CMU Seasons Dataset, RobotCar Seasons Dataset</li>
+<li>Scape-Imperial Localization Dataset</li>
+<li>InLoc Dataset</li>
+</ul>
+<h3 id="Learned-Features"><a href="#Learned-Features" class="headerlink" title="Learned Features"></a>Learned Features</h3><div align="center"> 
+  <img src="/pictures/localization/11.png" width="400" height="300" alt align="center">
+</div>
+
+<ul>
+<li>Higher-Level Features: Model higher-lever structures rather than low-level information (gradients, …)</li>
+<li>Detector often a bottleneck under challenging conditions.</li>
+<li>CNN layers define higher-level descriptors and detectors.</li>
+<li>Asymmetric matching avoids storing dense descriptors</li>
+<li>Joint detection &amp; description helps handle:<ul>
+<li>Strong changes in scene appearance &amp; geometry</li>
+<li>Low-level vs. higher-level structures</li>
+</ul>
+</li>
+</ul>
+<h2 id="People"><a href="#People" class="headerlink" title="People"></a>People</h2><p>Let’s have a look at people who are famous in this area.</p>
+<h3 id="Torsten-Sattler"><a href="#Torsten-Sattler" class="headerlink" title="Torsten Sattler"></a>Torsten Sattler</h3><div align="center"> 
+  <img src="/pictures/localization/12.png" width="500" height="400" alt align="center">
+</div>
+
+<ul>
+<li>D2-Net: A trainable CNN for Joint Description and Detection of Local Featrues</li>
+<li>BAD SLAM: Bundle Adjusted Direct RGB-D SLAM</li>
+</ul>
+<h3 id="Eric-Brachmann"><a href="#Eric-Brachmann" class="headerlink" title="Eric Brachmann"></a>Eric Brachmann</h3><div align="center"> 
+  <img src="/pictures/localization/13.png" width="800" height="500" alt align="center">
+</div>
+
+<ul>
+<li>DSAC - Differentiable RANSAC for Camera Localization</li>
+<li>Learning Less is More - 6D Camera Localization via 3D Surface Regression</li>
+<li>Neural-Guided RANSAC: Learning Where to Sample Model Hypothesis</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://cloudstore.zih.tu-dresden.de/index.php/s/jKWcqopYH369Ztm#pdfviewer" target="_blank" rel="noopener">https://cloudstore.zih.tu-dresden.de/index.php/s/jKWcqopYH369Ztm#pdfviewer</a></li>
+<li><a href="https://drive.google.com/file/d/147NgkJu-tKyrqFtUFpSR7j7yxM-mmcev/view" target="_blank" rel="noopener">https://drive.google.com/file/d/147NgkJu-tKyrqFtUFpSR7j7yxM-mmcev/view</a></li>
+</ul>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/localization/" rel="tag">localization</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/12/24/r2d2/">
+                <span class="level-item">R2D2</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+</div>
+                
+                
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    Di Huang
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2019 Di Huang&nbsp;
+                Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                <br>
+                <span id="busuanzi_container_site_uv">
+                Visited by <span id="busuanzi_value_site_uv">0</span> users
+                </span>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+<script>
+var IcarusThemeSettings = {
+    article: {
+        highlight: {
+            clipboard: true,
+            fold: 'unfolded'
+        }
+    }
+};
+</script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+
+
+
+    
+    
+<script src="/js/animation.js"></script>
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+<script src="/js/gallery.js" defer></script>
+
+    
+    
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/" target="_blank" rel="noopener">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+    
+    
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something..." />
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
